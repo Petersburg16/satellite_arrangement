@@ -4,10 +4,13 @@ from scipy.optimize import fsolve
 
 class RoundTrack:
     """
-    卫星轨道父类，用于生成近地回顾圆轨道参数
+    卫星父类，用于生成近地回顾圆轨道参数
+    a与i之一必须给定其一，另一个参数通过计算得到
 
-    D:星下点轨迹重复需要的圈数，整数
-    N:星下点轨迹重复需要的天数，整数
+    推荐N/D在15左右，i在60度左右的时候，a在7000000米处
+
+    D:星下点轨迹重复需要的天数，整数
+    N:星下点轨迹重复需要的圈数，整数
     a:轨道半长轴，米
     i:轨道倾角，弧度每秒
 
@@ -17,13 +20,15 @@ class RoundTrack:
     miu:常数，地球引力常数，3.986005e14 立方米每平方秒
     
 
-
-
     n=计算中间项，航天器平均角速度
     DotOmega:计算中间项，升交点赤经变化率
     T0:计算中间项，密切轨道周期（存疑，暂时以无摄动轨道周期代替）
 
-    a与i之一必须给定其一，另一个参数通过计算得到
+    上述计算中间项都合并在fslove求解方程中，注释可以辅助阅读原计算公式
+    结论和书上的图p61图4.1基本吻合，误差可能来源于密切轨道周期的计算
+
+
+    
     """
     def __init__(self,D=1,N=1,a=0,i=0):
         # 检查N和D是否是整数
@@ -53,67 +58,24 @@ class RoundTrack:
                 return self.N*(2*pi/np.sqrt(self.miu/(self.a**3)))*(1-(3*self.j2*(12-10*(np.sin(x)**2)))/(8*self.a**2))-self.D*2*pi/(self.omegae-((-(3*self.j2*self.aE**2)/(2*self.a**2))*np.sqrt(self.miu/(self.a**3))*np.cos(x)))
             x0 = np.deg2rad(15)
 
-            sol = fsolve(equation, x0)  
-            print(np.rad2deg(sol))
+            sol = fsolve(equation, x0)
+            self.i=sol  
+            
         else:
             def equation(x):  
                 return self.N*(2*pi/np.sqrt(self.miu/(x**3)))*(1-(3*self.j2*(12-10*(np.sin(self.i)**2)))/(8*x**2))-self.D*2*pi/(self.omegae-((-(3*self.j2*self.aE**2)/(2*x**2))*np.sqrt(self.miu/(x**3))*np.cos(self.i)))
             x0 = 7000000
-            sol = fsolve(equation, x0)  
-            print(sol)
+            sol = fsolve(equation, x0)
+            self.a=sol  
+            
         
 
-  
-
-
-
-# obj=RoundTrack(1,15,0,np.deg2rad(60))
-
-
-
-
-
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-class satellite:
+class Satellite(RoundTrack):
     """
-    卫星类，默认以 STARLINK-31328 - 轨道参数
-    a:半长轴
-    b:偏心率
-    i:轨道倾角
+    卫星类
+
+    e:常数，偏心率
+
     w:近地点幅角
     Omega0:初始时刻升交点赤经
     M0:初始时刻平近点角
@@ -131,9 +93,8 @@ class satellite:
     """
     def __init__(
         self,
-        a=481.5,
-        e=0.0001325,
-        i=53.1557,
+        e=0,
+
         w=81.8308,
         Omega0=182.3353,
         M0=325.1008,
