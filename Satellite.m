@@ -49,13 +49,13 @@ classdef Satellite
             % Allow setup time parameters without defaults.
             %
             % Parameters：
-            % days: (float,optional)total days of simulation. Defaults to 1.
+            % days: (float,optional)total days of simulation. Defaults to 7.
             % h: (float,optional)Discrete interval (s). Defaults to 5.
             %
             % Verify Parameters
             arguments
                 obj
-                days (1,1) double = 1
+                days (1,1) double = 7
                 h (1,1) double = 5
             end
             obj.days=days;
@@ -65,7 +65,7 @@ classdef Satellite
             % Allow setup auxiliary parameters without defaults.
             % 
             % Parameters：
-            % G_0: (float,optional)total days of simulation. Defaults to 1. 
+            % G_0: (float,optional)Greenwich sidereal hour angle. Defaults to 0. 
             % 
             % Verify Parameters
             arguments
@@ -79,11 +79,13 @@ classdef Satellite
             miu=3.9860044e14;
             J2=1.08263e-3;
             R_e=6371.393e3;
+            
             n_M=sqrt(miu/obj.a^3);
             CJ2=1.5*n_M*J2*(R_e/obj.a)^2;
-            i_temp=deg2rad(obj.i);
-            obj.b_Omega=-CJ2*cos(i_temp);
-            obj.b_M=n_M-CJ2*(1.5*sin(i_temp)-1);
+
+            i_rad=deg2rad(obj.i);
+            obj.b_Omega=-CJ2*cos(i_rad);
+            obj.b_M=n_M-CJ2*(1.5*sin(i_rad)^2-1);
         end
         function obj=set_target(obj,lambda_T,phi_T,rho_bar)
             % Allow setup target latitude and longitudes without defaults.
@@ -125,10 +127,13 @@ classdef Satellite
             G_0_rad=deg2rad(obj.G_0);
 
             % Calculate M_K and Omega_k by rad.
-            delta_M_temp=deg2rad(obj.b_M.*t);
-            delta_Omega_temp=deg2rad(obj.b_Omega.*t);
-            M_k=M_rad+theta_k_rad+delta_M_temp;
-            Omega_k=Omega_rad+delta_Omega_temp;
+            % delta_M_temp=deg2rad(obj.b_M.*t);
+            % delta_Omega_temp=deg2rad(obj.b_Omega.*t);
+            % M_k=M_rad+theta_k_rad+delta_M_temp;
+            % Omega_k=Omega_rad+delta_Omega_temp;
+
+            M_k=M_rad+theta_k_rad+obj.b_M.*t;
+            Omega_k=Omega_rad+obj.b_Omega.*t;
 
             % Calculate lambda and phi by rad.
             lambda=Omega_k+atan(tan(M_k).*cos(i_rad))-(G_0_rad+omega_e.*t);
@@ -141,6 +146,7 @@ classdef Satellite
             end
             R_e=6371.393e3;
             [lambda,phi]= cal_nadir_point(obj,theta_k);
+            
             lambda_T_rad=deg2rad(obj.lambda_T);
             phi_T_rad=deg2rad(obj.phi_T);
             rho_bar_rad=deg2rad(obj.rho_bar);
