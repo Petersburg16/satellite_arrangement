@@ -49,14 +49,14 @@ classdef Satellite
             % Allow setup time parameters without defaults.
             %
             % Parameters：
-            % days: (float,optional)total days of simulation. Defaults to 7.
-            % h: (float,optional)Discrete interval (s). Defaults to 5.
+            % days: (float,optional)total days of simulation. Defaults to 1.
+            % h: (float,optional)Discrete interval (s). Defaults to 30.
             %
             % Verify Parameters
             arguments
                 obj
-                days (1,1) double = 7
-                h (1,1) double = 5
+                days (1,1) double = 1
+                h (1,1) double = 30
             end
             obj.days=days;
             obj.h=h;
@@ -80,12 +80,12 @@ classdef Satellite
             J2=1.08263e-3;
             R_e=6371.393e3;
             
-            n_M=sqrt(miu/obj.a^3);
-            CJ2=1.5*n_M*J2*(R_e/obj.a)^2;
+            n_M=sqrt(miu/(obj.a^3));
+            CJ2=1.5*n_M*J2*((R_e/obj.a)^2);
 
             i_rad=deg2rad(obj.i);
             obj.b_Omega=-CJ2*cos(i_rad);
-            obj.b_M=n_M-CJ2*(1.5*sin(i_rad)^2-1);
+            obj.b_M=n_M-CJ2*(1.5*(sin(i_rad)^2)-1);
         end
         function obj=set_target(obj,lambda_T,phi_T,rho_bar)
             % Allow setup target latitude and longitudes without defaults.
@@ -117,9 +117,14 @@ classdef Satellite
         end
         function [lambda,phi]= cal_nadir_point(obj,theta_k)
             % Calculate the track of substellar point
+            %
+            % Parameters：
+            % theta_k: (float)Phase change of satellite (deg).
+
+            % Setup omega_e and generate a timeline.
             omega_e = 7.292e-5;
             t = gen_timeline(obj);
-            % Convert parameters from deg to rad 
+            % Convert parameters from deg to rad.
             M_rad=deg2rad(obj.M);
             theta_k_rad=deg2rad(theta_k);
             i_rad=deg2rad(obj.i);
@@ -127,38 +132,33 @@ classdef Satellite
             G_0_rad=deg2rad(obj.G_0);
 
             % Calculate M_K and Omega_k by rad.
-            % delta_M_temp=deg2rad(obj.b_M.*t);
-            % delta_Omega_temp=deg2rad(obj.b_Omega.*t);
-            % M_k=M_rad+theta_k_rad+delta_M_temp;
-            % Omega_k=Omega_rad+delta_Omega_temp;
-
             M_k=M_rad+theta_k_rad+obj.b_M.*t;
             Omega_k=Omega_rad+obj.b_Omega.*t;
 
             % Calculate lambda and phi by rad.
             lambda=Omega_k+atan(tan(M_k).*cos(i_rad))-(G_0_rad+omega_e.*t);
             phi=asin(sin(M_k).*sin(i_rad));
+
         end
         function obj = cal_tau(obj, theta_k)
             arguments
                 obj 
                 theta_k(1,1) double =0;
             end
-            R_e=6371.393e3;
             [lambda,phi]= cal_nadir_point(obj,theta_k);
             
             lambda_T_rad=deg2rad(obj.lambda_T);
             phi_T_rad=deg2rad(obj.phi_T);
             rho_bar_rad=deg2rad(obj.rho_bar);
             % Calculate target Earth-Fixed Coordinate System.
-            x_T=R_e*cos(lambda_T_rad)*cos(phi_T_rad);
-            y_T=R_e*sin(lambda_T_rad)*cos(phi_T_rad);
-            z_T=R_e*sin(phi_T_rad);
+            x_T=cos(lambda_T_rad)*cos(phi_T_rad);
+            y_T=sin(lambda_T_rad)*cos(phi_T_rad);
+            z_T=sin(phi_T_rad);
 
             % Calculate substellar point track in the earth-fixed coordinate system.
-            x_k=R_e.*cos(lambda).*cos(phi);
-            y_k=R_e.*sin(lambda).*cos(phi);
-            z_k=R_e.*sin(phi);
+            x_k=cos(lambda).*cos(phi);
+            y_k=sin(lambda).*cos(phi);
+            z_k=sin(phi);
 
 
             % Calculate the ground coverage time window.
@@ -167,10 +167,7 @@ classdef Satellite
             rho=zeros(size(tempK,1),1);
 
             dotProducts=tempT' *tempK';
-            norm_tempT=norm(tempT);
-            norms_tempK=sqrt(sum(tempK.^2,2));
-
-            rho=acos(dotProducts ./(norm_tempT .* norms_tempK'));
+            rho=acos(dotProducts);
             obj.tau=(abs(rho)<rho_bar_rad);
         end
     end
