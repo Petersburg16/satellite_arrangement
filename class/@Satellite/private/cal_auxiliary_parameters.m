@@ -2,7 +2,7 @@ function obj=cal_auxiliary_parameters(obj)
 % Calculate auxiliary parameters b_Omega and b_M.
 miu=3.9860044e14;
 J2=1.08263e-3;
-R_e=6371.393e3;
+R_e=6378.139e3;
 
 n_M=sqrt(miu/(obj.a^3));
 CJ2=1.5*n_M*J2*((R_e/obj.a)^2);

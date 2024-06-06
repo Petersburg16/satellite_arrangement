@@ -1,4 +1,4 @@
-function obj = cal_tau(obj, theta_k)
+function obj = update(obj, theta_k)
 arguments
     obj
     theta_k(1,1) double =0;

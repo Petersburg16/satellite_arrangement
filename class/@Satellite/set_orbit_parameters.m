@@ -3,7 +3,7 @@ function obj=set_orbit_parameters(obj,M,a,e,i,Omega,omega)
             %
             % Parameters：
             % M: (float)Initial mean anomaly(deg).
-            % a: (float,optional) Semi-major axis (m). Defaults to 6939.76e3.
+            % a: (float,optional) Semi-major axis (m). Defaults to 6896.27e3.
             % e: (float,optional) eccentricity. Defaults to 0.
             % i: (float,optional) Orbital inclination(deg). Defaults to 98.
             % Omega: (float,optional) Right ascension of ascending node(deg). Defaults to 284.507.
@@ -13,7 +13,7 @@ function obj=set_orbit_parameters(obj,M,a,e,i,Omega,omega)
             arguments
                 obj
                 M (1,1) double
-                a (1,1) double = 6939.76e3
+                a (1,1) double = 6896.27e3
                 e(1,1) double=0
                 i(1,1) double=98
                 Omega(1,1) double=284.507

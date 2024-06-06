@@ -13,14 +13,9 @@ classdef Satellite
             obj=set_auxiliary_parameters(obj);
             obj=cal_auxiliary_parameters(obj);
             obj=set_target(obj);
-            obj=cal_tau(obj);
-        end
-        function obj=update(obj)
-            obj=cal_tau(obj);
+            obj=update(obj);
         end
     end
-
-
 end
 
 
