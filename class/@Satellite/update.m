@@ -3,6 +3,7 @@ arguments
     obj
     theta_k(1,1) double =0;
 end
+obj=gen_timeline(obj);
 [lambda,phi]= cal_nadir_point(obj,theta_k);
 
 lambda_T_rad=deg2rad(obj.lambda_T);
