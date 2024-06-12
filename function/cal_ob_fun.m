@@ -5,7 +5,7 @@ function ob_fun=cal_ob_fun(x,sat_array,sat_num,k)
 % k：目标函数中的gama
 
 
-% 累加邻近卫星的时间窗口
+% 累加邻近卫星的时间窗口 
 tau=zeros(1,length(sat_array{1}.tau));
 flag=sat_num;
 
