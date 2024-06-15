@@ -12,10 +12,8 @@ flag=sat_num;
 
 flag=length(sat_array);
 for i=1:flag
-        continue
-    else
     tau=tau+A(sat_num,i)*sat_array{i}.tau;
-    end
+
 end
 
 sat=sat_array{sat_num};
