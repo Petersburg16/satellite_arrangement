@@ -25,10 +25,10 @@ r_k=obj.a*(1-obj.e^2)./(1+obj.e*cos(M_k));
 X_k_orbit=zeros(3,length(obj.t));
 X_k_ECI=zeros(3,length(obj.t));
 X_k_ECF=zeros(3,length(obj.t));
-for i=1:length(obj.t)
-X_k_orbit(:,i)=[r_k(i)*cos(M_k(i)),r_k(i)*sin(M_k(i)),0]';
-X_k_ECI(:,i)=Satellite.rz(-Omega_k(i))*Satellite.rx(-i_rad)*Satellite.rz(-omega_rad)*X_k_orbit(:,i);
-X_k_ECF(:,i)=Satellite.rz(-(G_0_rad+omega_e*obj.t(i)))*X_k_ECI(:,i);
+parfor i=1:length(obj.t)
+    X_k_orbit(:,i)=[r_k(i)*cos(M_k(i)),r_k(i)*sin(M_k(i)),0]';
+    X_k_ECI(:,i)=Satellite.rz(-Omega_k(i))*Satellite.rx(-i_rad)*Satellite.rz(-omega_rad)*X_k_orbit(:,i);
+    X_k_ECF(:,i)=Satellite.rz(-(G_0_rad+omega_e*obj.t(i)))*X_k_ECI(:,i);
 end
 
 lambda=atan2(X_k_ECF(2,:),X_k_ECF(1,:));
