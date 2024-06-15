@@ -10,13 +10,10 @@ A=cal_matrix_A(sat_array);
 tau=zeros(1,length(sat_array{1}.tau));
 
 flag=length(sat_array);
-if sat_num==1
-    tau=A(sat_num,flag).*sat_array{flag}.tau+A(sat_num,sat_num+1).*sat_array{sat_num+1}.tau;
-elseif sat_num==flag
-    tau=A(sat_num,sat_num-1).*sat_array{sat_num-1}.tau+A(sat_num,1).*sat_array{1}.tau;
-else
-    tau=A(sat_num,sat_num-1).*sat_array{sat_num-1}.tau+A(sat_num,sat_num+1).*sat_array{sat_num+1}.tau;
+for i=1:flag
+    tau=tau+A(sat_num,i)*sat_array{i}.tau;
 end
+
 sat=sat_array{sat_num};
 sat=sat.update(x);
 tau=(abs(tau)==0);
