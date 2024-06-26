@@ -18,18 +18,23 @@ omega_rad=deg2rad(obj.omega);
 % Calculate M_K and Omega_k by rad.
 M_k=M_rad+theta_k_rad+obj.b_M.*obj.t;
 Omega_k=Omega_rad+obj.b_Omega.*obj.t;
-r_k=obj.a*(1-obj.e^2)./(1+obj.e*cos(M_k));
+
+% 修改r_k,因为e=0
+r_k=obj.a;
+X_k_orbit=[r_k.*cos(M_k)',r_k.*sin(M_k)',zeros(length(obj.t),1)]';
+X_k_orbit=reshape(X_k_orbit,3,1,[]);
+
+eul_angle_orbit2ECI=[-Omega_k;ones(size(Omega_k))*(-i_rad);ones(size(Omega_k))*(-omega_rad)]';
+rotm_orbit2ECI = eul2rotm(eul_angle_orbit2ECI,"ZXZ");
+X_k_ECI = mtimesx(rotm_orbit2ECI, X_k_orbit);
+
+eul_angle_ECI2ECF=[-(G_0_rad+omega_e.*obj.t);zeros(size(Omega_k));zeros(size(Omega_k))]';
+rotm_ECI2ECF = eul2rotm(eul_angle_ECI2ECF,"ZXY");
+
+X_k_ECF = mtimesx(rotm_ECI2ECF, X_k_ECI);
+X_k_ECF=reshape(X_k_ECF,3,[]);
 
 
-% 此处的操作有待向量化
-X_k_orbit=zeros(3,length(obj.t));
-X_k_ECI=zeros(3,length(obj.t));
-X_k_ECF=zeros(3,length(obj.t));
-parfor i=1:length(obj.t)
-    X_k_orbit(:,i)=[r_k(i)*cos(M_k(i)),r_k(i)*sin(M_k(i)),0]';
-    X_k_ECI(:,i)=Satellite.rz(-Omega_k(i))*Satellite.rx(-i_rad)*Satellite.rz(-omega_rad)*X_k_orbit(:,i);
-    X_k_ECF(:,i)=Satellite.rz(-(G_0_rad+omega_e*obj.t(i)))*X_k_ECI(:,i);
-end
 
 lambda=atan2(X_k_ECF(2,:),X_k_ECF(1,:));
 phi=asin(X_k_ECF(3,:)./r_k);
