@@ -19,29 +19,6 @@ classdef Satellite
 
         end
     end
-    methods(Static)
-        function R_x=rx(theta)
-            R_x=[
-                1,          0,          0;
-                0,          cos(theta), -sin(theta);
-                0,          sin(theta), cos(theta)
-                ];
-        end
-        function R_y=ry(theta)
-            R_y=[
-                cos(theta), 0,          sin(theta);
-                0,          1,          0;
-                -sin(theta),0,          cos(theta)
-                ];
-        end
-        function R_z=rz(theta)
-            R_z=[
-                cos(theta), -sin(theta),0;
-                sin(theta), cos(theta), 0;
-                0,          0,          1
-                ];
-        end
-    end
 end
 
 
