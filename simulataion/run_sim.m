@@ -28,6 +28,6 @@ end
 % disp('Running SIM1');
 % SIM1
 % disp('Running SIM2');
-% SIM2
-disp('Running SIM3');
+SIM2
+% disp('Running SIM3');
 SIM3

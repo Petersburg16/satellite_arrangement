@@ -8,7 +8,7 @@ arguments
     sat_array 
     sat_num 
     k 
-    J2_index =ones(length(sat_array))
+    J2_index =ones(1,length(sat_array))
 end
 A=cal_matrix_A(sat_array);
 
@@ -26,6 +26,6 @@ sat=sat.update(x);
 tau=(abs(tau)==0);
 J1=(sum(sat.tau.*tau)*sat.h)/sat.days;
 
-J2=k*x^2/J2_index(sat_num);
+J2=k*x^2*J2_index(sat_num);
 ob_fun=J2-J1;
 end
